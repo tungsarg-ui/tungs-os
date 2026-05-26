@@ -410,8 +410,8 @@ export default function Login() {
               </svg>
               <div className="login-divider" />
               <div className="login-tagline">
-                TUNGS OS
-                <span style={{fontSize:"9px",opacity:0.6,letterSpacing:"1.5px"}}>Insumos y Herramientas Industriales</span>
+                <span style={{fontSize:"16px",fontWeight:"700",letterSpacing:"4px",color:"rgba(255,255,255,0.95)",display:"block",marginBottom:"6px"}}>TUNGS <span style={{color:"#fab12e"}}>◆</span> OS</span>
+                <span style={{fontSize:"9px",opacity:0.55,letterSpacing:"2px",display:"block"}}>Insumos y Herramientas Industriales</span>
               </div>
             </div>
             <div className="login-version">© 2026 TUNGS S.A.® — Todos los derechos reservados</div>
