@@ -47,9 +47,9 @@ const MODULOS = [
     icon: "ti-truck-delivery",
     color: "#0891b2",
     bg: "#ecfeff",
-    url: "#",
+    url: "/operaciones",
     roles: ["directivo", "administrativo", "deposito", "repartidor"],
-    estado: "proximo"
+    estado: "activo"
   },
   {
     key: "cobranzas",
