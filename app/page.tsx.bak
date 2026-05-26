@@ -1,0 +1,120 @@
+"use client"
+import { useState } from "react"
+
+export default function Home() {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [showPass, setShowPass] = useState(false)
+
+  async function handleLogin() {
+    if (!email || !password) { setError("Completá usuario y contraseña"); return }
+    setLoading(true); setError("")
+    try {
+      const res = await fetch("https://crm.tungs.com.ar/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      })
+      const data = await res.json()
+      if (!res.ok) { setError(data.error || "Credenciales incorrectas"); setLoading(false); return }
+      localStorage.setItem("tungs_token", data.token)
+      localStorage.setItem("tungs_user", JSON.stringify(data.user))
+      // Redirect según origen
+      const params = new URLSearchParams(window.location.search)
+      const redirect = params.get("redirect")
+      if (redirect === "erp") {
+        window.location.href = "https://erp.tungs.com.ar?token=" + data.token
+      } else {
+        window.location.href = "/home"
+      }
+    } catch(e) {
+      setError("Error de conexión. Intentá de nuevo.")
+      setLoading(false)
+    }
+  }
+
+  function handleKey(e: React.KeyboardEvent) {
+    if (e.key === "Enter") handleLogin()
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-5" style={{background:'linear-gradient(135deg,#1a2d4a 0%,#2a3f5f 35%,#3a3a50 70%,#1e1e2e 100%)'}}>
+      <div className="w-full max-w-[940px] min-h-[540px] rounded-[18px] overflow-hidden flex shadow-2xl" style={{boxShadow:'0 40px 80px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.06)'}}>
+
+        {/* IZQUIERDA */}
+        <div className="flex-1 flex flex-col items-center justify-center p-14 relative overflow-hidden" style={{background:'linear-gradient(160deg,#5b8de8 0%,#3a6fd4 100%)'}}>
+          <div className="relative z-10 flex flex-col items-center gap-5">
+            <img src="/logo.svg" alt="TUNGS" className="w-[190px] h-auto drop-shadow-2xl" />
+            <div className="w-9 h-0.5 rounded-full" style={{background:'rgba(255,255,255,0.35)'}} />
+            <p className="text-[11.5px] font-normal text-center uppercase tracking-[2.5px] leading-7" style={{color:'rgba(255,255,255,0.62)'}}>Sistema Enterprise V 1.0</p>
+          </div>
+          <p className="absolute bottom-5 text-[10px] text-center w-full" style={{color:'rgba(255,255,255,0.38)'}}>© 2026 TUNGS® — Marca Registrada. Todos los derechos reservados.</p>
+        </div>
+
+        {/* DERECHA */}
+        <div className="flex-[1.1] flex items-center justify-center p-12" style={{background:'linear-gradient(180deg,#ffffff 0%,#e8eef8 100%)'}}>
+          <div className="w-full max-w-[320px]">
+            <h2 className="text-2xl font-semibold tracking-tight" style={{color:'#1a2a3a'}}>Iniciar sesión</h2>
+            <p className="text-[13.5px] mt-1 mb-8" style={{color:'#6b7c93'}}>Ingresá tus credenciales para acceder</p>
+
+            {error && (
+              <div className="mb-4 px-4 py-3 rounded-[8px] text-[12.5px]" style={{background:'#fef2f2',border:'1px solid #fecaca',color:'#dc2626'}}>
+                {error}
+              </div>
+            )}
+
+            <div className="mb-4">
+              <label className="block text-[11px] font-semibold uppercase tracking-[1.2px] mb-1.5" style={{color:'#6b7c93'}}>Usuario</label>
+              <input
+                type="email" placeholder="usuario@tungs.com.ar"
+                value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={handleKey}
+                className="w-full px-4 py-3 rounded-[9px] text-sm outline-none border-[1.5px]"
+                style={{borderColor:'#d0daea',color:'#1a2a3a',fontFamily:'inherit'}}
+                onFocus={e=>{e.target.style.borderColor='#5b8de8';e.target.style.boxShadow='0 0 0 3px rgba(91,141,232,0.13)'}}
+                onBlur={e=>{e.target.style.borderColor='#d0daea';e.target.style.boxShadow='none'}}
+              />
+            </div>
+
+            <div className="mb-2">
+              <label className="block text-[11px] font-semibold uppercase tracking-[1.2px] mb-1.5" style={{color:'#6b7c93'}}>Contraseña</label>
+              <div className="relative">
+                <input
+                  type={showPass?"text":"password"} placeholder="••••••••"
+                  value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={handleKey}
+                  className="w-full px-4 py-3 rounded-[9px] text-sm outline-none border-[1.5px]"
+                  style={{borderColor:'#d0daea',color:'#1a2a3a',fontFamily:'inherit',paddingRight:'44px'}}
+                  onFocus={e=>{e.target.style.borderColor='#5b8de8';e.target.style.boxShadow='0 0 0 3px rgba(91,141,232,0.13)'}}
+                  onBlur={e=>{e.target.style.borderColor='#d0daea';e.target.style.boxShadow='none'}}
+                />
+                <button
+                  type="button" onClick={()=>setShowPass(!showPass)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9ca3af] hover:text-[#6b7280]"
+                  style={{background:'none',border:'none',cursor:'pointer',fontSize:'18px'}}
+                >{showPass?"🙈":"👁"}</button>
+              </div>
+            </div>
+
+            <button
+              onClick={handleLogin} disabled={loading}
+              className="w-full py-3 mt-3 rounded-[9px] text-white font-semibold text-[14.5px] tracking-wide cursor-pointer border-none"
+              style={{background:loading?'#93afd4':'linear-gradient(135deg,#5b8de8 0%,#3a6fd4 100%)',boxShadow:'0 4px 16px rgba(91,141,232,0.38)',transition:'all .2s'}}
+            >
+              {loading ? "Verificando..." : "Ingresar al sistema"}
+            </button>
+
+            <div className="text-center mt-4">
+              <a href="#" className="text-[12.5px] font-medium" style={{color:'#5b8de8'}}>¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <div className="flex items-center gap-2 mt-7 px-4 py-2.5 rounded-[8px] text-[11px]" style={{background:'rgba(91,141,232,0.07)',border:'1px solid rgba(91,141,232,0.15)',color:'#6b7c93'}}>
+              <span>🔒</span> Conexión segura — SSL/TLS cifrado extremo a extremo
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )
+}
